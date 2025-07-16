@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import DashboardCard from '../components/DashboardCard';
 import RideTable from '../components/RideTable';
 import sampleRides from '../data/sampleRides';
+import Footer from '../components/Footer';
 
 const CompanyDashboard = () => (
   <>
@@ -20,6 +21,7 @@ const CompanyDashboard = () => (
         </div>
       </div>
       <RideTable rides={sampleRides} />
+      <Footer />
     </div>
   </>
 );

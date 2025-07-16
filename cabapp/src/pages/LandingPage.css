@@ -96,11 +96,26 @@
 }
 @media (max-width: 575.98px) {
   .modal-dialog {
-    margin: 1rem;
-    max-width: 95vw;
+    margin: 0.5rem auto;
+    max-width: 99vw;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
   }
   .modal-content {
-    padding: 0.5rem 0.2rem 1.2rem 0.2rem;
+    padding: 3rem;
+    border-radius: 1rem;
+    width: 100vw;
+    min-height: auto;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 400px) {
+  .modal-content {
+    padding: 0.2rem 0.05rem 0.8rem 0.05rem;
+    border-radius: 0.7rem;
   }
 }
   

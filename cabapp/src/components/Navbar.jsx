@@ -1,24 +1,33 @@
 import React from 'react';
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Navbar = () => (
-  <nav className="navbar navbar-expand-lg navbar-light bg-light">
-    <div className="container-fluid">
-      <a className="navbar-brand" href="#">CabApp</a>
-      <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span className="navbar-toggler-icon"></span>
-      </button>
-      <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            <a className="nav-link active" aria-current="page" href="#">Home</a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link" href="#">Dashboard</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-);
+const AppNavbar = () => {
+  const navigate = useNavigate();
 
-export default Navbar; 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
+
+  return (
+    <Navbar bg="light" expand="lg" className="shadow-sm">
+      <Container>
+        <Navbar.Brand href="#">CabApp</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="#">Home</Nav.Link>
+            <Nav.Link href="#">Dashboard</Nav.Link>
+          </Nav>
+          <Button variant="outline-danger" onClick={handleLogout}>
+            Log Out
+          </Button>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
+};
+
+export default AppNavbar; 

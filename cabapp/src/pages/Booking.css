@@ -1,0 +1,91 @@
+.booking-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f0ff 0%, #f8f9fa 100%);
+  padding: 0;
+}
+
+.booking-outer {
+  max-width: 440px;
+  margin: 48px auto 32px auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  padding: 36px 28px 32px 28px;
+  position: relative;
+  top: 32px;
+  min-height: 300px;
+}
+
+.booking-title {
+  text-align: center;
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  color: #1a237e;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 600px) {
+  .booking-outer {
+    padding: 18px 6px 18px 6px;
+    max-width: 98vw;
+    top: 12px;
+    margin-bottom: 40px;
+  }
+  .booking-title {
+    font-size: 1.3rem;
+  }
+}
+
+/* Keep previous form styles below */
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 2px;
+  color: #333;
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1.5px solid #bdbdbd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px #e3f2fd;
+}
+
+.booking-btn {
+  width: 100%;
+  background: linear-gradient(90deg, #1976d2 60%, #42a5f5 100%);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+}
+
+.booking-btn:hover {
+  background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+} 

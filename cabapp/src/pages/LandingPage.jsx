@@ -1,35 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import './LandingPage.css';
 import axios from 'axios';
-
-// const [email, setEmail] = useState('');
-// const [password, setPassword] = useState('');
-// const [companyId, setCompanyId] = useState('');
-// const [companyName, setCompanyName] = useState('');
-
-
-// const handleLogin = async (e) => {
-//   e.preventDefault();
-
-//   const payload = {
-//     email,
-//     password,
-//     role,
-//     ...(role === 'user' && { companyId, companyName })
-//   };
-
-//   try {
-//     const response = await axios.post('/auth/login', payload);
-//     console.log('Login Success:', response.data);
-//     alert('Login successful!');
-//     setShowModal(false); // close modal
-//     // Optionally store token: localStorage.setItem('token', response.data.token);
-//   } catch (err) {
-//     console.error('Login Failed:', err.response?.data || err.message);
-//     alert('Login failed. Please check your credentials.');
-//   }
-// };
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 
 const features = [
@@ -98,43 +73,51 @@ const LandingPage = () => {
   const [password, setPassword] = useState('');
   const [companyId, setCompanyId] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+  const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/booking');
+    }
+  }, [navigate]);
+
+  const handleLogin = async (e) => {
+    console.log("Login button clicked");
+    e.preventDefault();
     try {
       const loginData = {
         email,
         password,
-        role
+        role,
+        companyName,
+        companyId
       };
-  
-      // Add companyId only if role is "user"
-      if (role === 'user') {
-        loginData.companyId = 'OM001'; // or get from form/input
-      }
-  
+      // Show loading message (optional)
       // Select the correct endpoint
       const endpoint =
-        role === 'company'
-          ? 'http://localhost:5000/api/company/login'
-          : 'http://localhost:5000/api/login';
-  
-      console.log("Sending login data:", loginData);
-  
+        role === "company"
+          ? "http://localhost:5000/api/company/login"
+          : "http://localhost:5000/api/login";
       const response = await axios.post(endpoint, loginData);
-  
-      console.log("Login Success:", response.data);
-      // Handle success (e.g., redirect, set auth, etc.)
-  
+      // Store token for both user and company
+      localStorage.setItem('token', response.data.token);
+      toast.success("Login successful!");
+      if (role === "user") {
+        navigate("/booking");
+      } else if (role === "company") {
+        navigate("/company-dashboard");
+      }
     } catch (error) {
       if (error.response) {
         console.log("Login Failed:", error.response.data);
-        alert(error.response.data.message); // Optional UI alert
+        toast.error(error.response.data.message || "Invalid credentials");
       } else {
         console.log("Login Error:", error.message);
-        alert("Network error");
+        toast.error("Network error, please try again!");
       }
     }
   };
@@ -221,19 +204,43 @@ const LandingPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="mb-3">
+            <div className="mb-3" style={{ position: 'relative' }}>
               <label htmlFor="loginPassword" className="form-label">Password</label>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 className="form-control"
                 id="loginPassword"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <span
+                onClick={() => setShowPassword((prev) => !prev)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '38px',
+                  cursor: 'pointer',
+                  fontSize: '1.3rem',
+                  color: '#888',
+                  userSelect: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.03-10-7 0-1.13.37-2.19 1.025-3.13M6.22 6.22A9.956 9.956 0 0112 5c5.523 0 10 4.03 10 7 0 1.61-.81 3.13-2.18 4.37M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 9l-18-18" /></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm7 0c0 2.97-4.477 7-10 7S2 14.97 2 12s4.477-7 10-7 10 4.03 10 7z" /></svg>
+                )}
+              </span>
             </div>
-            <button type="submit" className="btn btn-primary w-100">
+            <button type="submit" className="btn btn-primary w-100 mb-2">
               Login as {role === 'user' ? 'User' : 'Company'}
+            </button>
+            <button type="button" className="btn btn-outline-secondary w-100" onClick={handleCloseModal}>
+              Cancel
             </button>
           </form>
         </div>
@@ -303,16 +310,7 @@ const LandingPage = () => {
         </div>
       </section>
       {/* FOOTER */}
-      <footer className="footer-section py-4 bg-dark text-light">
-        <div className="container text-center">
-          <div className="mb-2">&copy; {new Date().getFullYear()} CabApp. All rights reserved.</div>
-          <div>
-            <a href="#" className="text-light mx-2">Privacy Policy</a>|
-            <a href="#" className="text-light mx-2">Terms</a>|
-            <a href="#" className="text-light mx-2">Contact</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 };
