@@ -132,6 +132,7 @@ const LandingPage = () => {
               <div className="d-flex flex-column flex-sm-row gap-3 mb-3 justify-content-center justify-content-lg-start">
                 <button className="btn btn-primary btn-lg px-4 shadow" onClick={() => navigate('/booking')}>Book Now</button>
                 <button className="btn btn-outline-primary btn-lg px-4 shadow" onClick={() => navigate('/login')}>Login / Register</button>
+                <button className="btn btn-outline-dark btn-lg px-4 shadow" onClick={() => navigate('/admin/login')}>Admin Login</button>
               </div>
             </div>
             <div className="col-12 col-lg-5 text-center">

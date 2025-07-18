@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence, motion } from 'framer-motion';
 import Profile from './pages/Profile';
 import RideHistory from './pages/RideHistory';
+import AdminLogin from './pages/AdminLogin';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -48,9 +49,14 @@ function AnimatedRoutes() {
         } />
         <Route path="/admin" element={
           <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.4, ease: 'easeInOut' }}>
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole="admin">
               <Admin />
             </ProtectedRoute>
+          </motion.div>
+        } />
+        <Route path="/admin/login" element={
+          <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.4, ease: 'easeInOut' }}>
+            <AdminLogin />
           </motion.div>
         } />
         <Route path="/profile" element={
