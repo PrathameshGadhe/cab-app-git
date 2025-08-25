@@ -1,0 +1,108 @@
+// Sample ride history data for testing the frontend
+export const sampleRideHistory = [
+  {
+    _id: "booking_001",
+    pickup: "Mumbai Airport",
+    dropoff: "Bandra West",
+    date: "2024-01-15",
+    time: "14:30",
+    cabType: "Sedan",
+    passengers: 2,
+    includeReturn: false,
+    fare: 850,
+    distance: 12.5,
+    status: "completed",
+    assignedDriver: {
+      _id: "driver_001",
+      driverId: "DRV001",
+      fullName: "Rajesh Kumar",
+      phoneNumber: "+91 98765 43210",
+      email: "rajesh.kumar@example.com",
+      gender: "Male",
+      vehicleNumber: "MH-01-AB-1234",
+      vehicleType: "Sedan",
+      status: "active",
+      totalRides: 156
+    }
+  },
+  {
+    _id: "booking_002",
+    pickup: "Andheri Station",
+    dropoff: "Juhu Beach",
+    date: "2024-01-12",
+    time: "18:00",
+    cabType: "SUV",
+    passengers: 4,
+    includeReturn: true,
+    returnDate: "2024-01-12",
+    returnTime: "22:00",
+    fare: 1200,
+    distance: 8.2,
+    status: "accepted",
+    assignedDriver: {
+      _id: "driver_002",
+      driverId: "DRV002",
+      fullName: "Priya Sharma",
+      phoneNumber: "+91 87654 32109",
+      email: "priya.sharma@example.com",
+      gender: "Female",
+      vehicleNumber: "MH-02-CD-5678",
+      vehicleType: "SUV",
+      status: "active",
+      totalRides: 89
+    }
+  },
+  {
+    _id: "booking_003",
+    pickup: "Colaba",
+    dropoff: "Worli",
+    date: "2024-01-10",
+    time: "09:15",
+    cabType: "Mini",
+    passengers: 1,
+    includeReturn: false,
+    fare: 450,
+    distance: 5.8,
+    status: "pending",
+    assignedDriver: null
+  },
+  {
+    _id: "booking_004",
+    pickup: "BKC",
+    dropoff: "Powai",
+    date: "2024-01-08",
+    time: "16:45",
+    cabType: "Hatchback",
+    passengers: 3,
+    includeReturn: false,
+    fare: 680,
+    distance: 7.3,
+    status: "assigned",
+    assignedDriver: {
+      _id: "driver_003",
+      driverId: "DRV003",
+      fullName: "Amit Patel",
+      phoneNumber: "+91 76543 21098",
+      email: "amit.patel@example.com",
+      gender: "Male",
+      vehicleNumber: "MH-03-EF-9012",
+      vehicleType: "Hatchback",
+      status: "active",
+      totalRides: 234
+    }
+  },
+  {
+    _id: "booking_005",
+    pickup: "Thane",
+    dropoff: "Navi Mumbai",
+    date: "2024-01-05",
+    time: "11:30",
+    cabType: "Sedan",
+    passengers: 2,
+    includeReturn: false,
+    fare: 950,
+    distance: 15.2,
+    status: "denied",
+    assignedDriver: null
+  }
+]; 

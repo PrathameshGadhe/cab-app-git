@@ -88,4 +88,65 @@
 .booking-btn:hover {
   background: linear-gradient(90deg, #1565c0 60%, #1976d2 100%);
   box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
-} 
+}
+
+/* Trip Type Tooltip Styles */
+.position-relative {
+  position: relative;
+}
+
+.trip-type-tooltip {
+  visibility: hidden;
+  width: 280px;
+  background-color: #fff;
+  color: #333;
+  text-align: left;
+  border-radius: 8px;
+  padding: 12px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.trip-type-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #fff transparent transparent transparent;
+}
+
+.position-relative:hover .trip-type-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Style for the radio button labels */
+.position-relative label {
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.position-relative:hover label {
+  background-color: #f5f9ff;
+}
+
+/* Make the tooltip responsive */
+@media (max-width: 768px) {
+  .trip-type-tooltip {
+    width: 240px;
+    font-size: 0.85rem;
+  }
+}

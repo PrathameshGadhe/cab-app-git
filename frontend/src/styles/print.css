@@ -1,0 +1,44 @@
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #invoice-print, #invoice-print * {
+    visibility: visible;
+  }
+  
+  #invoice-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  /* Hide action buttons when printing */
+  .no-print, .no-print * {
+    display: none !important;
+  }
+  
+  /* Ensure proper page breaks */
+  .page-break {
+    page-break-after: always;
+  }
+  
+  /* Ensure tables don't break across pages */
+  table {
+    page-break-inside: auto;
+  }
+  
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  /* Ensure signature area is visible */
+  .signature-pad {
+    border: 1px solid #000;
+    min-height: 100px;
+  }
+}

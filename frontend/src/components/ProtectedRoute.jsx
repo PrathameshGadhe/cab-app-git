@@ -32,4 +32,4 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   return children;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;
