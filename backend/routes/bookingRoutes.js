@@ -29,6 +29,7 @@ router.get('/allBookings', auth, (req, res, next) => {
     return res.status(403).json({ message: 'Access denied. Admins and company users only.' });
   }
   
+  
   // If user is a company admin, automatically filter by their company
   if (req.user.role === 'company') {
     req.query.companyId = req.user.companyId;

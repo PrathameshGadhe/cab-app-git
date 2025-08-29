@@ -79,8 +79,22 @@ const createBooking = async (req, res) => {
       includeReturn, returnDate, returnTime,
       distance, fare, // Accept distance and fare from frontend
       pickupLocation, dropoffLocation, // Accept location coordinates
-      duration // Accept duration in hours from frontend
+      duration = DEFAULT_DURATION // Default duration if not provided
     } = req.body;
+
+    // Validate required fields
+    if (!pickup || !dropoff || !date || !time || !cabType || !passengers) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Validate location coordinates
+    if (!pickupLocation || !pickupLocation.lat || !pickupLocation.lng || !pickupLocation.address) {
+      return res.status(400).json({ error: 'Invalid pickup location data' });
+    }
+    
+    if (!dropoffLocation || !dropoffLocation.lat || !dropoffLocation.lng || !dropoffLocation.address) {
+      return res.status(400).json({ error: 'Invalid dropoff location data' });
+    }
 
     // Use the distance, fare, and duration calculated by frontend, or use defaults
     let finalDistance = parseFloat(distance) || DEFAULT_DISTANCE;
@@ -146,32 +160,34 @@ const createBooking = async (req, res) => {
       time,
       cabType,
       tripType,
-      passengers,
-      includeReturn,
-      returnDate: includeReturn ? returnDate : null,
-      returnTime: includeReturn ? returnTime : null,
+      passengers: parseInt(passengers, 10),
+      includeReturn: includeReturn || false,
+      returnDate: includeReturn ? returnDate : undefined,
+      returnTime: includeReturn ? returnTime : undefined,
       fare: finalFare,
       distance: finalDistance,
       duration: finalDuration,
       status: 'pending',
       userId: req.user.id,
       // Store location coordinates
-      pickupCoordinates: pickupLocation ? {
+      pickupCoordinates: {
         lat: parseFloat(pickupLocation.lat),
         lng: parseFloat(pickupLocation.lng),
-        address: pickup
-      } : null,
-      dropoffCoordinates: dropoffLocation ? {
+        address: pickupLocation.address || pickup
+      },
+      dropoffCoordinates: {
         lat: parseFloat(dropoffLocation.lat),
         lng: parseFloat(dropoffLocation.lng),
-        address: dropoff
-      } : null,
+        address: dropoffLocation.address || dropoff
+      },
       // Additional metadata
       metadata: {
         tripType,
         tripDays,
         calculatedAt: new Date()
-      }
+      },
+      // Initialize with null vehicle number
+      vehicleNumber: null
     });
 
     res.status(201).json({ 
@@ -232,7 +248,6 @@ const getAllBookings = async (req, res) => {
       ];
     }
     
-    
     // Apply driver filter if present
     if (driverId) {
       if (mongoose.Types.ObjectId.isValid(driverId)) {
@@ -244,14 +259,10 @@ const getAllBookings = async (req, res) => {
 
     // Apply company filter if present
     if (companyId) {
-      // Build the company query based on whether the input is a valid ObjectId
       const companyQuery = {};
-      
       if (mongoose.Types.ObjectId.isValid(companyId)) {
-        // If it's a valid ObjectId, search by _id
         companyQuery._id = companyId;
       } else {
-        // Otherwise search by companyId or companyCode (case-insensitive)
         companyQuery.$or = [
           { companyId: { $regex: new RegExp(`^${companyId}$`, 'i') } },
           { companyCode: { $regex: new RegExp(`^${companyId}$`, 'i') } }
@@ -259,12 +270,10 @@ const getAllBookings = async (req, res) => {
       }
       
       const company = await Company.findOne(companyQuery);
-
       if (!company) {
         return res.status(404).json({ error: 'Company not found' });
       }
       
-      // Include bookings for this company OR bookings with no company specified
       filter.$or = [
         { companyId: company._id },
         { companyId: { $exists: false } },
@@ -290,7 +299,6 @@ const getAllBookings = async (req, res) => {
         }
         return [field, sortOrder];
       });
-      
       const sortObject = Object.fromEntries(sortFields);
       query = query.sort(sortObject);
     }
@@ -302,79 +310,41 @@ const getAllBookings = async (req, res) => {
     
     // Handle field selection
     if (select) {
-      // Add vehicleNumber to the select fields if it's not already included
       const selectFields = select.split(',').map(f => f.trim());
       if (!selectFields.includes('vehicleNumber')) {
         selectFields.push('vehicleNumber');
       }
       query = query.select(selectFields.join(' '));
-    } else {
-      // If no select is specified, include vehicleNumber
-      query = query.select('vehicleNumber');
     }
-    
-    // Handle population of related fields
+
+    // Always populate assignedDriver with basic details
+    query = query.populate({
+      path: 'assignedDriver',
+      select: 'fullName phoneNumber vehicleNumber',
+      options: { strictPopulate: false }
+    });
+
+    // Handle population of related fields from query param
     if (populate) {
       const populateFields = populate.split(',').map(field => field.trim());
-      
-      // Define population options for each field
       const populateOptions = {
         'userId': { path: 'userId', select: 'name email phone' },
-        'assignedDriver': { 
-          path: 'assignedDriver', 
-          select: 'fullName phoneNumber vehicleNumber',
-          // Add strictPopulate: false to handle cases where the reference might not exist
-          options: { strictPopulate: false }
-        },
-        'driverId': { 
-          path: 'driverId', 
-          select: 'fullName phoneNumber',
-          options: { strictPopulate: false }
-        },
-        'companyId': { 
-          path: 'companyId', 
-          select: 'companyName companyId',
-          options: { strictPopulate: false }
-        },
-        // Remove vehicleId from population since it's not in the schema
-        // 'vehicleId': { path: 'vehicleId', select: 'vehicleNumber model type' },
-        
-        // Add any other fields that might be populated
-        'user': { 
-          path: 'userId', 
-          select: 'name email phone',
-          options: { strictPopulate: false }
-        },
-        'driver': { 
-          path: 'driverId', 
-          select: 'fullName phoneNumber',
-          options: { strictPopulate: false }
-        },
-        'company': { 
-          path: 'companyId', 
-          select: 'companyName companyId',
-          options: { strictPopulate: false }
-        },
-        // 'vehicle': { path: 'vehicleId', select: 'vehicleNumber model type' }
+        'driverId': { path: 'driverId', select: 'fullName phoneNumber', options: { strictPopulate: false } },
+        'companyId': { path: 'companyId', select: 'companyName companyId', options: { strictPopulate: false } },
+        'user': { path: 'userId', select: 'name email phone', options: { strictPopulate: false } },
+        'driver': { path: 'driverId', select: 'fullName phoneNumber', options: { strictPopulate: false } },
+        'company': { path: 'companyId', select: 'companyName companyId', options: { strictPopulate: false } }
       };
-      
-      // Filter out vehicleId from populate fields if present
-      const filteredPopulateFields = populate.split(',')
-        .map(field => field.trim())
-        .filter(field => field !== 'vehicleId');
-      
-      // Apply population for each requested field (using filtered fields)
+
+      const filteredPopulateFields = populateFields.filter(field => field !== 'vehicleId');
       filteredPopulateFields.forEach(field => {
         if (populateOptions[field]) {
           query = query.populate(populateOptions[field]);
         }
-        // Silently skip fields that don't have population options
       });
     }
     
-    
     const bookings = await query.sort(sort ? undefined : { createdAt: -1 });
-    
     
     res.json({ 
       success: true,
@@ -382,7 +352,6 @@ const getAllBookings = async (req, res) => {
       bookings 
     });
   } catch (err) {
-    // Create error context without referencing filter directly
     const errorContext = {
       message: err.message,
       stack: err.stack,
@@ -394,21 +363,16 @@ const getAllBookings = async (req, res) => {
         keyValue: err.keyValue,
         errors: err.errors
       },
-      filter: 'not defined' // Default value
+      filter: 'not defined'
     };
-    
-    // Try to get filter from the current scope if it exists
     try {
       if (typeof filter !== 'undefined') {
         errorContext.filter = filter;
       }
-    } catch (e) {
-      // If filter is not in scope, keep the default 'not defined' value
-    }
+    } catch (e) {}
     
     console.error('Error in getAllBookings:', JSON.stringify(errorContext, null, 2));
     
-    // More detailed error response
     const errorResponse = {
       success: false,
       error: 'Failed to fetch bookings',
@@ -426,6 +390,7 @@ const getAllBookings = async (req, res) => {
     res.status(500).json(errorResponse);
   }
 };
+
 
 // ------------------------------
 // Get User's Bookings (My Bookings)
@@ -574,29 +539,41 @@ const assignVehicleToBooking = async (req, res) => {
       return res.status(400).json({ message: 'Vehicle number is required' });
     }
 
-    const booking = await Booking.findById(bookingId);
-    if (!booking) {
+    // Use findByIdAndUpdate with runValidators to ensure validation passes
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      bookingId,
+      {
+        $set: {
+          vehicleNumber: vehicleNumber.trim().toUpperCase(),
+          'metadata.vehicleAssignedAt': new Date(),
+          'metadata.assignedBy': adminId
+        }
+      },
+      { 
+        new: true, // Return the updated document
+        runValidators: true // Run model validators on update
+      }
+    );
+
+    if (!updatedBooking) {
       return res.status(404).json({ message: 'Booking not found' });
     }
-
-    // Update the booking with vehicle information
-    booking.vehicleNumber = vehicleNumber.trim().toUpperCase();
-    booking.metadata.vehicleAssignedAt = new Date();
-    booking.metadata.assignedBy = adminId;
-
-    await booking.save();
 
     res.status(200).json({
       message: 'Vehicle assigned successfully',
       booking: {
-        _id: booking._id,
-        vehicleNumber: booking.vehicleNumber,
-        assignedAt: booking.metadata.vehicleAssignedAt
+        _id: updatedBooking._id,
+        vehicleNumber: updatedBooking.vehicleNumber,
+        assignedAt: updatedBooking.metadata?.vehicleAssignedAt
       }
     });
   } catch (error) {
     console.error('Error assigning vehicle:', error);
-    res.status(500).json({ message: 'Error assigning vehicle to booking', error: error.message });
+    res.status(500).json({ 
+      message: 'Error assigning vehicle to booking', 
+      error: error.message,
+      details: error.errors // Include validation error details if any
+    });
   }
 };
 

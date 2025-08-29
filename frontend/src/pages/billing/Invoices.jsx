@@ -35,7 +35,7 @@ useEffect(() => {
         params: {
           populate: 'userId,assignedDriver,companyId,vehicleId,driverId',
           select: 'bookingId,createdAt,pickup,dropoff,fare,status,userId,assignedDriver,companyId,vehicleId,driverId',
-          limit: 1000 // Increase limit to get more records, adjust based on your needs
+          limit: 1000 // Get all records and handle filtering locally
         }
       });
       setAllBookings(response.data?.bookings || []);
@@ -63,10 +63,11 @@ useEffect(() => {
   
   // Apply company filter
   if (selectedCompany) {
-    filtered = filtered.filter(booking => 
-      booking.companyId?._id === selectedCompany || 
-      booking.companyId?.toString() === selectedCompany
-    );
+    filtered = filtered.filter(booking => {
+      // Check if booking has company info and matches selected company
+      const bookingCompanyId = booking.companyId?._id || booking.companyId || '';
+      return bookingCompanyId.toString() === selectedCompany.toString();
+    });
   }
   
   // Apply month filter
@@ -121,7 +122,6 @@ useEffect(() => {
   
   setBookings(filtered);
 }, [allBookings, selectedStatus, selectedCompany, selectedMonth, searchQuery, filters]);
-// 👆 added selectedStatus dependency
 
   // Fetch companies
   useEffect(() => {
@@ -265,7 +265,7 @@ useEffect(() => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-100 sticky top-0">
                   <tr>
-                    {['Booking ID', 'Date', 'Pickup', 'Dropoff', 'Driver', 'Vehicle', 'Fare', 'Actions'].map((head) => (
+                    {['Date', 'Pickup', 'Dropoff', 'Driver', 'Vehicle', 'Fare', 'Actions'].map((head) => (
                       <th
                         key={head}
                         className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
@@ -301,7 +301,6 @@ useEffect(() => {
                         key={b._id}
                         className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}
                       >
-                        <td className="px-6 py-4 text-sm">{b.bookingId || b._id?.slice(-6).toUpperCase()}</td>
                         <td className="px-6 py-4 text-sm whitespace-nowrap">
                           {formatDate(b.createdAt)}
                         </td>
