@@ -1,6 +1,17 @@
 
 
 const express = require('express');
+const router = express.Router();
+
+// Health check endpoint
+router.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 const {
   createBooking,
   getUserBookings,
@@ -14,7 +25,6 @@ const {
 } = require('../controllers/bookingController');
 const auth = require('../auth');
 
-const router = express.Router();
 
 // Create a new booking (user)
 router.post('/createBooking', auth, createBooking);
