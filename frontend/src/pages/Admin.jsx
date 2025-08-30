@@ -48,6 +48,22 @@ const Admin = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [active, setActive] = useState('dashboard');
+  const api = axios.create({
+    baseURL: '/api',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    withCredentials: true
+  });
+
+  // Add auth token to requests
+  api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
   
   // Update active state based on URL
   useEffect(() => {

@@ -48,13 +48,16 @@ const Login = () => {
     e.preventDefault();
     try {
       let endpoint;
+      let response;
+      
+      // Use relative path for API calls
       let payload = { ...loginData };
       
       console.log('Login attempt with role:', role);
       
       // Set endpoint and prepare payload based on role
       if (role === 'driver') {
-        endpoint = 'http://localhost:5000/api/driver/login';
+        endpoint = '/api/driver/login';
         payload = { password: loginData.password };
         
         if (loginData.email) {
@@ -65,13 +68,15 @@ const Login = () => {
           console.log('Using phone number for driver login');
         }
       } else if (role === 'company') {
-        endpoint = 'http://localhost:5000/api/company/login';
+        endpoint = '/api/company/login';
       } else {
-        endpoint = 'http://localhost:5000/api/auth/login';
+        endpoint = '/api/auth/login';
       }
 
       console.log('Making request to:', endpoint, 'with payload:', payload);
-      const response = await axios.post(endpoint, payload);
+      response = await axios.post(endpoint, payload, {
+        withCredentials: true
+      });
       
       console.log('Login response:', response.data);
       

@@ -7,8 +7,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './DriverDashboard.css';
 
-// WebSocket server URL
-const SOCKET_URL = 'http://localhost:5000';
+// WebSocket server URL - will use the same origin as the page
+const SOCKET_URL = ''; // Empty string will use current origin
 
 const DriverDashboard = () => {
   const [assignedBookings, setAssignedBookings] = useState([]);
@@ -37,12 +37,14 @@ const DriverDashboard = () => {
     }
 
     // Connect to WebSocket server
-    socketRef.current = io(SOCKET_URL, {
-      auth: { token },
+    socketRef.current = io({
+      path: '/socket.io', // This should match your Nginx WebSocket location
       transports: ['websocket'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      auth: { token },
+      withCredentials: true
     });
 
     socketRef.current.on('connect', () => {

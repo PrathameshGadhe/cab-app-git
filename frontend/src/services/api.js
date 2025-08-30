@@ -1,14 +1,12 @@
 import axios from 'axios';
 
-// Get API URL from Vite environment variables or use default
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-// Set up axios instance with auth token
+// Use relative path for API requests
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: '/api', // This will be relative to the current domain
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true // Important for cookies/sessions to work
 });
 
 // Add auth token to requests
